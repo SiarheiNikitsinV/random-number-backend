@@ -1,27 +1,33 @@
 const express = require("express");
+const mongoose = require('mongoose');
+
+const homeRoutes = require('./routes/home');
+const addRoutes = require('./routes/add');
+
  
 const app = express();
 
-app.get("/", (req, res) => {    
-  res.type("text/plain");
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
 
-  res.send("Main Page");   
-});
+app.use(express.urlencoded({extended: true}));
 
-app.get("/api/number", (req, res) => {   
-  res.type("text/plain");
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
-
-  let randomNumber = Math.floor(Math.random() * 10) + 1;
-  res.json({number: randomNumber});
-});
+app.use('/', homeRoutes);
+app.use('/api/number', homeRoutes);
+app.use('/add', addRoutes);
 
 
-const port = process.env.PORT || 5000;
-app.listen(port, function() {
-  console.log("Listening on " + port);
-});
+const PORT = process.env.PORT || 5000;
 
+
+async function start() {
+  try {
+    const url = `mongodb+srv://SerjNickey:666000666@cluster0-ybhdv.mongodb.net/numbers`;
+    await mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true});
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    })
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+start();
